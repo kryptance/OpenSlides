@@ -20,7 +20,16 @@ keycloak_admin = KeycloakAdmin(server_url=environ.get("KEYCLOAK_URL"),
 def create_or_get_realm(realm_name):
     realms = keycloak_admin.get_realms()
     if not any(realm.get('realm') == realm_name for realm in realms):
-        keycloak_admin.create_realm(payload={"realm": realm_name, "enabled": True})
+        keycloak_admin.create_realm(payload={"realm": realm_name, "enabled": True, "smtpServer": {
+            "host": "smtp.example.com",
+            "port": "587",
+            "from": "no-reply@example.com",
+            "auth": "true",
+            "user": "smtp_user",
+            "password": "smtp_password",
+            "ssl": "false",
+            "starttls": "true"
+        }})
         print(f"Created realm: {realm_name}")
     else:
         print(f"Realm {realm_name} already exists.")
@@ -84,6 +93,7 @@ def create_or_get_user(realm_name, users: list[tuple[str, int, str]]):
     for user_data in users:
         users = keycloak_admin.get_users(query={"username": user_data[0]})
         user_representation = {"username": user_data[0],
+                               "email": f"{user_data[0]}@localhost",
                                "enabled": True,
                                "emailVerified": True,
                                "firstName": user_data[0],
