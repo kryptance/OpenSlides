@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DockerComposeParser {
+class DockerComposeParser {
 
     public static DockerCompose parseComposeFile(String filePath) throws Exception {
         final var composeFileDir = Path.of(filePath).getParent();

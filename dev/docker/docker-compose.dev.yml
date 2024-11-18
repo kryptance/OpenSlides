@@ -43,7 +43,6 @@ services:
       - ../../openslides-datastore-service/datastore:/app/datastore
     ports:
       - 9010:9010
-      - 5680:5678
 
   datastore-writer:
     image: openslides-datastore-writer-dev
@@ -58,7 +57,6 @@ services:
       - OPENSLIDES_DEVELOPMENT=1
     ports:
       - 9011:9011
-      - 5679:5678
 
   postgres:
     image: postgres:15

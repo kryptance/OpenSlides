@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.List;
 
 @JsonIgnoreProperties("version")
-public class DockerCompose {
+class DockerCompose {
     public Map<String, Service> services;
 
     @JsonIgnoreProperties({"logging", "depends_on"})

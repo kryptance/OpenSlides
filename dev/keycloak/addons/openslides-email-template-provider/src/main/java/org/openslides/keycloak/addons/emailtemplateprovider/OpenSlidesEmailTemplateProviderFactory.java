@@ -15,9 +15,7 @@ public class OpenSlidesEmailTemplateProviderFactory  implements EmailTemplatePro
     @Override
     public EmailTemplateProvider create(KeycloakSession session) {
         log.info("Creating OpenSlidesEmailTemplateProvider");
-        RealmModel realm = session.getContext().getRealm();
-        UserModel user = session.getContext().getAuthenticationSession().getAuthenticatedUser();
-        return new OpenSlidesEmailTemplateProvider(session, realm, user);
+        return new OpenSlidesEmailTemplateProvider(session);
     }
 
     @Override

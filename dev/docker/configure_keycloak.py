@@ -20,7 +20,7 @@ keycloak_admin = KeycloakAdmin(server_url=environ.get("KEYCLOAK_URL"),
 def create_or_get_realm(realm_name):
     realms = keycloak_admin.get_realms()
     if not any(realm.get('realm') == realm_name for realm in realms):
-        keycloak_admin.create_realm(payload={"realm": realm_name, "enabled": True, "smtpServer": {
+        keycloak_admin.create_realm(payload={"realm": realm_name, "enabled": True, "resetPasswordAllowed": True, "smtpServer": {
             "host": "smtp.example.com",
             "port": "587",
             "from": "no-reply@example.com",
@@ -76,6 +76,7 @@ def create_or_get_client(realm_name, client_name, client_scope_name):
                      "baseUrl": "https://localhost:8000",
                      "attributes": {
                          "login_theme": "os",
+                         "openslides.email-action.url": "http://backend:9002/system/action/email",
                          "backchannel.logout.url": "http://backend:9002/system/action/logout",
                          "post.logout.redirect.uris": "https://localhost:8000/*",
                          "backchannel.logout.session.required": "true"
