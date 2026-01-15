@@ -1,0 +1,155 @@
+{
+  "realm": "openslides",
+  "enabled": true,
+  "displayName": "OpenSlides",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "accessCodeLifespan": 60,
+  "accessCodeLifespanUserAction": 300,
+  "accessCodeLifespanLogin": 1800,
+  "defaultRoles": ["offline_access", "uma_authorization"],
+  "roles": {
+    "realm": [
+      {
+        "name": "user",
+        "description": "Regular OpenSlides user"
+      },
+      {
+        "name": "admin",
+        "description": "OpenSlides administrator"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "openslides-client",
+      "name": "OpenSlides Client",
+      "description": "OpenSlides web application",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "openslides-secret",
+      "redirectUris": [
+        "https://localhost:8000/*",
+        "http://localhost:8000/*",
+        "https://localhost/*",
+        "http://localhost/*"
+      ],
+      "webOrigins": [
+        "https://localhost:8000",
+        "http://localhost:8000",
+        "https://localhost",
+        "http://localhost",
+        "+"
+      ],
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ],
+      "protocolMappers": [
+        {
+          "name": "session-id-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "sid",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "sid",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "openslides-user-id-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "openslides_user_id",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "openslides_user_id",
+            "jsonType.label": "int"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "testuser",
+      "email": "testuser@example.com",
+      "firstName": "Test",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "testpassword",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["user"],
+      "attributes": {
+        "openslides_user_id": ["2"]
+      }
+    },
+    {
+      "username": "admin",
+      "email": "admin@example.com",
+      "firstName": "Admin",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin", "user"],
+      "attributes": {
+        "openslides_user_id": ["1"]
+      }
+    }
+  ],
+  "browserSecurityHeaders": {
+    "contentSecurityPolicyReportOnly": "",
+    "xContentTypeOptions": "nosniff",
+    "referrerPolicy": "no-referrer",
+    "xRobotsTag": "none",
+    "xFrameOptions": "SAMEORIGIN",
+    "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
+    "xXSSProtection": "1; mode=block",
+    "strictTransportSecurity": "max-age=31536000; includeSubDomains"
+  }
+}
