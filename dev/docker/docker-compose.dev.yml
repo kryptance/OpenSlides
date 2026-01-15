@@ -98,9 +98,10 @@ services:
       - ../../openslides-backend/tests:/app/tests
       - ../../openslides-backend/cli:/app/cli
       - ../../openslides-backend/data:/app/data
-      - ../../openslides-backend/meta:/app/meta      
+      - ../../openslides-backend/meta:/app/meta
       - ../../openslides-backend/requirements:/app/requirements
       - ../../openslides-backend/scripts:/app/scripts
+      - ../../openslides-auth-service/auth/libraries/pip-auth:/app/osauthlib-dev
 
   autoupdate:
     build:
@@ -268,6 +269,20 @@ services:
       driver: "none" # disable saving logs
     ports:
       - "8025:8025" # web ui to check mails manually
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: start-dev --import-realm
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HTTP_RELATIVE_PATH=/auth
+      - KC_HOSTNAME_STRICT=false
+      - KC_PROXY_HEADERS=xforwarded
+    volumes:
+      - ./keycloak/realm-openslides.json:/opt/keycloak/data/import/realm-openslides.json:ro
+    ports:
+      - "8080:8080"
 
   vote:
     build:
