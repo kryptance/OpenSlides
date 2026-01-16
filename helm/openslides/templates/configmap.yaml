@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "openslides.configmapName" . }}
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+data:
+  # Database configuration
+  DATABASE_HOST: {{ include "openslides.postgresql.host" . | quote }}
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: {{ .Values.postgresql.auth.database | quote }}
+  DATABASE_USER: {{ .Values.postgresql.auth.username | quote }}
+
+  # Redis configuration (various services use different env var names)
+  CACHE_HOST: {{ include "openslides.redis.host" . | quote }}
+  CACHE_PORT: "6379"
+  REDIS_HOST: {{ include "openslides.redis.host" . | quote }}
+  REDIS_PORT: "6379"
+  MESSAGE_BUS_HOST: {{ include "openslides.redis.host" . | quote }}
+  MESSAGE_BUS_PORT: "6379"
+
+  # Service discovery
+  DATASTORE_READER_HOST: "{{ include "openslides.fullname" . }}-datastore-reader"
+  DATASTORE_READER_PORT: "9010"
+  DATASTORE_WRITER_HOST: "{{ include "openslides.fullname" . }}-datastore-writer"
+  DATASTORE_WRITER_PORT: "9011"
+  AUTH_HOST: "{{ include "openslides.fullname" . }}-auth"
+  AUTH_PORT: "9004"
+  AUTOUPDATE_HOST: "{{ include "openslides.fullname" . }}-autoupdate"
+  AUTOUPDATE_PORT: "9012"
+  VOTE_HOST: "{{ include "openslides.fullname" . }}-vote"
+  VOTE_PORT: "9013"
+  ICC_HOST: "{{ include "openslides.fullname" . }}-icc"
+  ICC_PORT: "9007"
+  MEDIA_HOST: "{{ include "openslides.fullname" . }}-media"
+  MEDIA_PORT: "9006"
+  SEARCH_HOST: "{{ include "openslides.fullname" . }}-search"
+  SEARCH_PORT: "9050"
+  MANAGE_HOST: "{{ include "openslides.fullname" . }}-manage"
+  MANAGE_PORT: "9008"
+
+  # Backend services
+  ACTION_HOST: "{{ include "openslides.fullname" . }}-backend-action"
+  ACTION_PORT: "9002"
+  PRESENTER_HOST: "{{ include "openslides.fullname" . }}-backend-presenter"
+  PRESENTER_PORT: "9003"
+
+  # OpenSlides settings
+  OPENSLIDES_DEVELOPMENT: "false"
+  OPENSLIDES_LOGLEVEL: "info"
+
+  # Instance info
+  INSTANCE_DOMAIN: {{ .Values.global.domain | quote }}
+
+  # OIDC Configuration
+  {{- if .Values.oidc.enabled }}
+  OIDC_ENABLED: "true"
+  OIDC_ISSUER: {{ .Values.oidc.issuer | quote }}
+  OIDC_ISSUER_EXTERNAL: {{ .Values.oidc.issuerExternal | default .Values.oidc.issuer | quote }}
+  OIDC_CLIENT_ID: {{ .Values.oidc.clientId | quote }}
+  OIDC_JWKS_URL: {{ .Values.oidc.jwksUrl | quote }}
+  OIDC_USER_CLAIM: {{ .Values.oidc.userClaim | default "sub" | quote }}
+  {{- else }}
+  OIDC_ENABLED: "false"
+  {{- end }}

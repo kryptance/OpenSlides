@@ -1,0 +1,81 @@
+{{- if .Values.auth.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openslides.fullname" . }}-auth
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: auth
+spec:
+  replicas: {{ .Values.auth.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "openslides.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: auth
+  template:
+    metadata:
+      labels:
+        {{- include "openslides.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: auth
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: auth
+          image: {{ include "openslides.image" (dict "global" .Values.global "image" .Values.auth.image) }}
+          imagePullPolicy: {{ .Values.auth.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.auth.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "openslides.configmapName" . }}
+          env:
+            - name: AUTH_HOST
+              value: "0.0.0.0"
+            - name: AUTH_PORT
+              value: {{ .Values.auth.service.port | quote }}
+            - name: AUTH_TOKEN_KEY_FILE
+              value: "/run/secrets/auth_token_key"
+            - name: AUTH_COOKIE_KEY_FILE
+              value: "/run/secrets/auth_cookie_key"
+            - name: INTERNAL_AUTH_PASSWORD_FILE
+              value: "/run/secrets/internal_auth_password"
+            {{- if .Values.oidc.enabled }}
+            - name: OIDC_ENABLED
+              value: "true"
+            {{- end }}
+          volumeMounts:
+            - name: secrets
+              mountPath: /run/secrets
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /system/auth
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /system/auth
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.auth.resources | nindent 12 }}
+      volumes:
+        - name: secrets
+          secret:
+            secretName: {{ include "openslides.secretsName" . }}
+            items:
+              - key: auth-token-key
+                path: auth_token_key
+              - key: auth-cookie-key
+                path: auth_cookie_key
+              - key: internal-auth-password
+                path: internal_auth_password
+{{- end }}

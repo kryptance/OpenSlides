@@ -1,0 +1,38 @@
+{{- if .Values.media.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openslides.fullname" . }}-media
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: media
+spec:
+  type: {{ .Values.media.service.type }}
+  ports:
+    - port: {{ .Values.media.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "openslides.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: media
+{{- end }}
+---
+{{- if and .Values.media.enabled .Values.media.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "openslides.fullname" . }}-media
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- if .Values.global.storageClass }}
+  storageClassName: {{ .Values.global.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.media.persistence.size }}
+{{- end }}

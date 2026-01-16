@@ -1,0 +1,90 @@
+{{- if .Values.vote.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openslides.fullname" . }}-vote
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: vote
+spec:
+  replicas: {{ .Values.vote.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "openslides.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: vote
+  template:
+    metadata:
+      labels:
+        {{- include "openslides.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: vote
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: vote
+          image: {{ include "openslides.image" (dict "global" .Values.global "image" .Values.vote.image) }}
+          imagePullPolicy: {{ .Values.vote.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.vote.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "openslides.configmapName" . }}
+          env:
+            - name: VOTE_HOST
+              value: "0.0.0.0"
+            - name: VOTE_PORT
+              value: {{ .Values.vote.service.port | quote }}
+            - name: AUTH_TOKEN_KEY_FILE
+              value: "/run/secrets/auth_token_key"
+            - name: AUTH_COOKIE_KEY_FILE
+              value: "/run/secrets/auth_cookie_key"
+            - name: VOTE_DATABASE_HOST
+              value: {{ include "openslides.postgresql.host" . | quote }}
+            - name: VOTE_DATABASE_PORT
+              value: "5432"
+            - name: VOTE_DATABASE_USER
+              value: {{ .Values.postgresql.auth.username | quote }}
+            - name: VOTE_DATABASE_NAME
+              value: {{ .Values.postgresql.auth.database | quote }}
+            - name: VOTE_DATABASE_PASSWORD_FILE
+              value: "/run/secrets/postgres_password"
+          volumeMounts:
+            - name: secrets
+              mountPath: /run/secrets
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /system/vote/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /system/vote/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.vote.resources | nindent 12 }}
+      volumes:
+        - name: secrets
+          projected:
+            sources:
+              - secret:
+                  name: {{ include "openslides.secretsName" . }}
+                  items:
+                    - key: auth-token-key
+                      path: auth_token_key
+                    - key: auth-cookie-key
+                      path: auth_cookie_key
+              - secret:
+                  name: {{ include "openslides.fullname" . }}-postgresql
+                  items:
+                    - key: password
+                      path: postgres_password
+{{- end }}

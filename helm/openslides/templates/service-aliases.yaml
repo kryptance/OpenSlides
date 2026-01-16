@@ -1,0 +1,154 @@
+# Service aliases for internal service discovery
+# The proxy expects short service names like "client", "auth", etc.
+# but Helm creates services with fullname prefix like "openslides-client"
+# Using FQDN format for ExternalName to ensure proper DNS resolution
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: client
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-client.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-auth.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: autoupdate
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-autoupdate.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-backend-action.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-action
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-backend-action.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-presenter
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-backend-presenter.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datastore-reader
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-datastore-reader.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datastore-writer
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-datastore-writer.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: icc
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-icc.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: manage
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-manage.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: media
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-media.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-search.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vote
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-vote.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-postgresql.{{ .Release.Namespace }}.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.fullname" . }}-redis-master.{{ .Release.Namespace }}.svc.cluster.local

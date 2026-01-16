@@ -1,0 +1,59 @@
+{{- if .Values.backend.action.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openslides.fullname" . }}-backend-action
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend-action
+spec:
+  type: {{ .Values.backend.action.service.type }}
+  ports:
+    - port: {{ .Values.backend.action.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "openslides.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: backend-action
+{{- end }}
+---
+{{- if .Values.backend.presenter.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openslides.fullname" . }}-backend-presenter
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend-presenter
+spec:
+  type: {{ .Values.backend.presenter.service.type }}
+  ports:
+    - port: {{ .Values.backend.presenter.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "openslides.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: backend-presenter
+{{- end }}
+---
+{{- if .Values.backend.manage.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openslides.fullname" . }}-backend-manage
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend-manage
+spec:
+  type: {{ .Values.backend.manage.service.type }}
+  ports:
+    - port: {{ .Values.backend.manage.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "openslides.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: backend-manage
+{{- end }}

@@ -1,0 +1,19 @@
+{{- if .Values.icc.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openslides.fullname" . }}-icc
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: icc
+spec:
+  type: {{ .Values.icc.service.type }}
+  ports:
+    - port: {{ .Values.icc.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "openslides.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: icc
+{{- end }}

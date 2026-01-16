@@ -1,0 +1,76 @@
+{{- if .Values.media.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openslides.fullname" . }}-media
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: media
+spec:
+  replicas: {{ .Values.media.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "openslides.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: media
+  template:
+    metadata:
+      labels:
+        {{- include "openslides.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: media
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: media
+          image: {{ include "openslides.image" (dict "global" .Values.global "image" .Values.media.image) }}
+          imagePullPolicy: {{ .Values.media.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.media.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "openslides.configmapName" . }}
+          env:
+            - name: MEDIA_HOST
+              value: "0.0.0.0"
+            - name: MEDIA_PORT
+              value: {{ .Values.media.service.port | quote }}
+            - name: DATABASE_PASSWORD_FILE
+              value: "/run/secrets/postgres_password"
+          volumeMounts:
+            - name: secrets
+              mountPath: /run/secrets
+              readOnly: true
+            {{- if .Values.media.persistence.enabled }}
+            - name: media-data
+              mountPath: /app/media
+            {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.media.resources | nindent 12 }}
+      volumes:
+        - name: secrets
+          secret:
+            secretName: {{ include "openslides.fullname" . }}-postgresql
+            items:
+              - key: password
+                path: postgres_password
+        {{- if .Values.media.persistence.enabled }}
+        - name: media-data
+          persistentVolumeClaim:
+            claimName: {{ include "openslides.fullname" . }}-media
+        {{- end }}
+{{- end }}

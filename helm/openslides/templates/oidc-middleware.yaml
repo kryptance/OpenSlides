@@ -1,0 +1,47 @@
+{{- if .Values.oidc.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "openslides.fullname" . }}-oidc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  plugin:
+    traefikoidc:
+      # Keycloak OIDC Provider URL
+      providerURL: {{ .Values.oidc.issuer | quote }}
+      clientID: {{ .Values.oidc.clientId | quote }}
+      clientSecret: {{ .Values.oidc.clientSecret | quote }}
+      # Session encryption key (min 32 chars)
+      sessionEncryptionKey: {{ .Values.oidc.sessionEncryptionKey | default (randAlphaNum 32) | quote }}
+      # Callback and logout URLs
+      callbackURL: /oauth2/callback
+      logoutURL: /oauth2/logout
+      # Scopes to request - use override mode to avoid automatic offline_access
+      overrideScopes: true
+      scopes:
+        - openid
+        - profile
+        - email
+        - roles
+      # Headers to pass to backend using Go template syntax
+      headers:
+        - name: "X-Forwarded-User"
+          value: {{ printf "{{.Claims.preferred_username}}" | quote }}
+        - name: "X-Auth-Request-Email"
+          value: {{ printf "{{.Claims.email}}" | quote }}
+        - name: "X-Auth-Request-Groups"
+          value: {{ printf "{{.Claims.groups}}" | quote }}
+      # Allow any authenticated user (or restrict by role/group)
+      {{- if .Values.oidc.allowedRolesAndGroups }}
+      allowedRolesAndGroups:
+        {{- toYaml .Values.oidc.allowedRolesAndGroups | nindent 8 }}
+      {{- end }}
+      # Paths that don't require OIDC authentication
+      # Note: Do NOT exclude /oauth2/callback and /oauth2/logout - the plugin handles these internally
+      # Only exclude actual public endpoints if needed
+      # excludedURLs:
+      #   - /health
+      #   - /ready
+{{- end }}

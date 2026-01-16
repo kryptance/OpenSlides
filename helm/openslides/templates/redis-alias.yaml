@@ -1,0 +1,11 @@
+{{- if .Values.redis.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ include "openslides.redis.host" . }}
+{{- end }}

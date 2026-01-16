@@ -1,0 +1,352 @@
+# OpenSlides Helm Chart Default Values
+# Override these in environment-specific values files (e.g., values-dev3.yaml)
+
+global:
+  # Domain for OpenSlides instance
+  domain: openslides.example.com
+  # Container image registry for OpenSlides services (NOT passed to Bitnami subcharts)
+  openslidesImageRegistry: ""
+  # Image pull secrets
+  imagePullSecrets: []
+  # Storage class for persistent volumes
+  storageClass: ""
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  tls:
+    enabled: true
+    secretName: openslides-tls
+
+# OIDC configuration (for keycloak-simple branch)
+oidc:
+  enabled: false
+  issuer: ""
+  issuerExternal: ""
+  clientId: ""
+  jwksUrl: ""
+  userClaim: "sub"
+
+# ============================================================================
+# Service Configurations
+# ============================================================================
+
+proxy:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: openslides-proxy
+    tag: "keycloak-simple"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+client:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: openslides-client
+    tag: "keycloak-simple"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9001
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+backend:
+  action:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: openslides-backend
+      tag: "keycloak-simple"
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 9002
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 512Mi
+  presenter:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: openslides-backend
+      tag: "keycloak-simple"
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 9003
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 512Mi
+  manage:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: openslides-backend
+      tag: "keycloak-simple"
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 9004
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+datastore:
+  reader:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: openslides-datastore-reader
+      tag: "keycloak-simple"
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 9010
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  writer:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: openslides-datastore-writer
+      tag: "keycloak-simple"
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 9011
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+autoupdate:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: openslides-autoupdate-service
+    tag: "keycloak-simple"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9012
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+auth:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: openslides-auth-service
+    tag: "keycloak-simple"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9004
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+vote:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: openslides-vote-service
+    tag: "keycloak-simple"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9013
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+icc:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: openslides-icc-service
+    tag: "keycloak-simple"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9007
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+media:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: openslides-media-service
+    tag: "keycloak-simple"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9006
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  persistence:
+    enabled: true
+    size: 10Gi
+
+search:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: openslides-search-service
+    tag: "keycloak-simple"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9050
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+manage:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: openslides-manage-service
+    tag: "keycloak-simple"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9008
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# ============================================================================
+# Bitnami PostgreSQL Configuration
+# ============================================================================
+
+postgresql:
+  enabled: true
+  auth:
+    database: openslides
+    username: openslides
+    # Password will be auto-generated or set in values-dev3.yaml
+    existingSecret: ""
+    secretKeys:
+      adminPasswordKey: postgres-password
+      userPasswordKey: password
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+# ============================================================================
+# Bitnami Redis Configuration
+# ============================================================================
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+# ============================================================================
+# Secrets Configuration
+# ============================================================================
+
+secrets:
+  # Auth token key for JWT signing (auto-generated if empty)
+  authTokenKey: ""
+  # Auth cookie key for cookie signing (auto-generated if empty)
+  authCookieKey: ""
+  # Superadmin password (auto-generated if empty)
+  superadminPassword: ""
+  # Internal auth password (auto-generated if empty)
+  internalAuthPassword: ""
+  # Manage auth password (auto-generated if empty)
+  manageAuthPassword: ""
