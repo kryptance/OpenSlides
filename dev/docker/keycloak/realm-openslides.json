@@ -41,13 +41,17 @@
         "https://localhost:8000/*",
         "http://localhost:8000/*",
         "https://localhost/*",
-        "http://localhost/*"
+        "http://localhost/*",
+        "https://openslides.dev.kryptance.io/*",
+        "https://openslides.dev.kryptance.io/oauth2/callback"
       ],
       "webOrigins": [
         "https://localhost:8000",
         "http://localhost:8000",
         "https://localhost",
         "http://localhost",
+        "https://openslides.dev.kryptance.io",
+        "https://auth.kryptance.io",
         "+"
       ],
       "publicClient": false,
