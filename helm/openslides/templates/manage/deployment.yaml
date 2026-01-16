@@ -1,0 +1,71 @@
+{{- if .Values.manage.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openslides.fullname" . }}-manage
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: manage
+spec:
+  replicas: {{ .Values.manage.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "openslides.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: manage
+  template:
+    metadata:
+      labels:
+        {{- include "openslides.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: manage
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: manage
+          image: {{ include "openslides.image" (dict "global" .Values.global "image" .Values.manage.image) }}
+          imagePullPolicy: {{ .Values.manage.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.manage.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "openslides.configmapName" . }}
+          env:
+            - name: MANAGE_HOST
+              value: "0.0.0.0"
+            - name: MANAGE_PORT
+              value: {{ .Values.manage.service.port | quote }}
+            - name: MANAGE_AUTH_PASSWORD_FILE
+              value: "/run/secrets/manage_auth_password"
+            - name: SUPERADMIN_PASSWORD_FILE
+              value: "/run/secrets/superadmin_password"
+          volumeMounts:
+            - name: secrets
+              mountPath: /run/secrets
+              readOnly: true
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.manage.resources | nindent 12 }}
+      volumes:
+        - name: secrets
+          secret:
+            secretName: {{ include "openslides.secretsName" . }}
+            items:
+              - key: manage-auth-password
+                path: manage_auth_password
+              - key: superadmin-password
+                path: superadmin_password
+{{- end }}

@@ -1,0 +1,86 @@
+{{- if .Values.backend.action.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openslides.fullname" . }}-backend-action
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend-action
+spec:
+  replicas: {{ .Values.backend.action.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "openslides.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend-action
+  template:
+    metadata:
+      labels:
+        {{- include "openslides.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: backend-action
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: backend-action
+          image: {{ include "openslides.image" (dict "global" .Values.global "image" .Values.backend.action.image) }}
+          imagePullPolicy: {{ .Values.backend.action.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.backend.action.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "openslides.configmapName" . }}
+          env:
+            - name: OPENSLIDES_BACKEND_COMPONENT
+              value: "action"
+            - name: OPENSLIDES_DEVELOPMENT
+              value: "true"
+            - name: DATABASE_PASSWORD_FILE
+              value: "/run/secrets/postgres_password"
+            - name: AUTH_TOKEN_KEY_FILE
+              value: "/run/secrets/auth_token_key"
+            - name: AUTH_COOKIE_KEY_FILE
+              value: "/run/secrets/auth_cookie_key"
+            - name: INTERNAL_AUTH_PASSWORD_FILE
+              value: "/run/secrets/internal_auth_password"
+          volumeMounts:
+            - name: secrets
+              mountPath: /run/secrets
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /system/action/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /system/action/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.backend.action.resources | nindent 12 }}
+      volumes:
+        - name: secrets
+          projected:
+            sources:
+              - secret:
+                  name: {{ include "openslides.secretsName" . }}
+                  items:
+                    - key: auth-token-key
+                      path: auth_token_key
+                    - key: auth-cookie-key
+                      path: auth_cookie_key
+                    - key: internal-auth-password
+                      path: internal_auth_password
+              - secret:
+                  name: {{ include "openslides.fullname" . }}-postgresql
+                  items:
+                    - key: password
+                      path: postgres_password
+{{- end }}

@@ -1,0 +1,48 @@
+{{- if .Values.client.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openslides.fullname" . }}-client
+  labels:
+    {{- include "openslides.labels" . | nindent 4 }}
+    app.kubernetes.io/component: client
+spec:
+  replicas: {{ .Values.client.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "openslides.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: client
+  template:
+    metadata:
+      labels:
+        {{- include "openslides.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: client
+    spec:
+      automountServiceAccountToken: false
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: client
+          image: {{ include "openslides.image" (dict "global" .Values.global "image" .Values.client.image) }}
+          imagePullPolicy: {{ .Values.client.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.client.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.client.resources | nindent 12 }}
+{{- end }}

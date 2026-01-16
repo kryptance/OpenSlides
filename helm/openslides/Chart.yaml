@@ -1,0 +1,26 @@
+apiVersion: v2
+name: openslides
+description: OpenSlides - Web-based presentation and assembly system
+type: application
+version: 0.1.0
+appVersion: "4.2.18"
+
+keywords:
+  - openslides
+  - assembly
+  - presentation
+  - voting
+
+maintainers:
+  - name: kryptance
+    email: admin@kryptance.io
+
+dependencies:
+  - name: postgresql
+    version: "~16.4.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: "~20.6.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled

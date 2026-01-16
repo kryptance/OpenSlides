@@ -1,0 +1,195 @@
+# OpenSlides Dev3 Environment Configuration
+# Deploy to: openslides.dev.kryptance.io on dev3 cluster
+
+global:
+  domain: openslides.dev.kryptance.io
+  openslidesImageRegistry: harbor.dev.kryptance.io/autohaus
+  storageClass: local-path
+  imagePullSecrets:
+    - name: harbor-registry
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  tls:
+    enabled: true
+    secretName: openslides-tls
+
+# Enable OIDC for Keycloak integration via oauth2-proxy
+oidc:
+  enabled: true
+  issuer: https://auth.kryptance.io/realms/openslides
+  issuerExternal: https://auth.kryptance.io/realms/openslides
+  clientId: openslides-client
+  # Client secret from Keycloak
+  clientSecret: "openslides-secret"
+  sessionEncryptionKey: "openslides-oidc-session-key-32ch"
+  jwksUrl: https://auth.kryptance.io/realms/openslides/protocol/openid-connect/certs
+  userClaim: "sub"
+
+# PostgreSQL dev settings
+postgresql:
+  image:
+    tag: latest
+  auth:
+    # Use 'openslides' to match DEV_SECRET used by datastore lib in OPENSLIDES_DEVELOPMENT mode
+    password: openslides
+    postgresPassword: postgres123
+  primary:
+    persistence:
+      storageClass: local-path
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+# Redis dev settings
+redis:
+  image:
+    tag: latest
+  master:
+    persistence:
+      storageClass: local-path
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+# Dev resource limits (smaller than production)
+proxy:
+  image:
+    pullPolicy: Always
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+client:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+backend:
+  action:
+    image:
+      pullPolicy: Always
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  presenter:
+    image:
+      pullPolicy: Always
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+datastore:
+  reader:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  writer:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+autoupdate:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+auth:
+  image:
+    pullPolicy: Always
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+vote:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+icc:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+media:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  persistence:
+    size: 5Gi
+
+search:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+manage:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
