@@ -1,48 +1,52 @@
 [submodule "openslides-datastore-service"]
 	path = openslides-datastore-service
-	url = https://github.com/OpenSlides/openslides-datastore-service.git
+	url = https://github.com/kryptance/openslides-datastore-service.git
 	branch = main
 [submodule "openslides-client"]
 	path = openslides-client
-	url = https://github.com/OpenSlides/openslides-client.git
-	branch = main
+	url = https://github.com/kryptance/openslides-client.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-backend"]
 	path = openslides-backend
-	url = https://github.com/OpenSlides/openslides-backend.git
-	branch = main
+	url = https://github.com/kryptance/openslides-backend.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-autoupdate-service"]
 	path = openslides-autoupdate-service
-	url = https://github.com/OpenSlides/openslides-autoupdate-service.git
-	branch = main
+	url = https://github.com/kryptance/openslides-autoupdate-service.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-auth-service"]
 	path = openslides-auth-service
-	url = https://github.com/OpenSlides/openslides-auth-service.git
-	branch = main
+	url = https://github.com/kryptance/openslides-auth-service.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-media-service"]
 	path = openslides-media-service
-	url = https://github.com/OpenSlides/openslides-media-service.git
-	branch = main
+	url = https://github.com/kryptance/openslides-media-service.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-manage-service"]
 	path = openslides-manage-service
 	url = https://github.com/OpenSlides/openslides-manage-service.git
 	branch = main
 [submodule "openslides-icc-service"]
 	path = openslides-icc-service
-	url = https://github.com/OpenSlides/openslides-icc-service.git
-	branch = main
+	url = https://github.com/kryptance/openslides-icc-service.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-vote-service"]
 	path = openslides-vote-service
-	url = https://github.com/OpenSlides/openslides-vote-service.git
-	branch = main
+	url = https://github.com/kryptance/openslides-vote-service.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-proxy"]
 	path = openslides-proxy
-	url = https://github.com/OpenSlides/openslides-proxy.git
+	url = https://github.com/kryptance/openslides-proxy.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-search-service"]
 	path = openslides-search-service
-	url = https://github.com/OpenSlides/openslides-search-service.git
+	url = https://github.com/kryptance/openslides-search-service.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-projector-service"]
 	path = openslides-projector-service
-	url = https://github.com/OpenSlides/openslides-projector-service.git
+	url = https://github.com/kryptance/openslides-projector-service.git
+	branch = keycloak-on-relational-db
 [submodule "openslides-go"]
 	path = lib/openslides-go
-	url = https://github.com/OpenSlides/openslides-go.git
+	url = https://github.com/kryptance/openslides-go.git
+	branch = keycloak-on-relational-db
